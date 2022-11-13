@@ -1,13 +1,9 @@
 package com.project;
+import com.project.frontend.ContentDisplay;
 
-/**
- * Hello world!
- *
- */
-public class App 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+public class App{
+    public static void main( String[] args ){
+        ContentDisplay contentDisplay = new ContentDisplay();
+        contentDisplay.renderDisplay();
     }
 }
