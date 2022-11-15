@@ -5,18 +5,20 @@ import com.google.gson.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 
 public class EmployeeFile {
-    private String fileContent;
+    private String rawContent;
 
-    public String getFileContent() {
-        if (fileContent == null) {
-            throw new RuntimeException("File content is null, please read the file first");
+    public String getRawContent() {
+        if (rawContent == null) {
+            throw new RuntimeException("File content is null, please load the file first");
         }
-        return fileContent;
+        return rawContent;
     }
 
-    public void readFile(String fileRoute) throws IOException {
+    public void loadFile(String fileRoute) throws IOException {
         StringBuilder fileContent = new StringBuilder();
         try (BufferedReader br = new BufferedReader(new FileReader(fileRoute))) {
             String line;
@@ -24,12 +26,13 @@ public class EmployeeFile {
                 fileContent.append(line);
             }
         }
-        this.fileContent = fileContent.toString();
+        this.rawContent = fileContent.toString();
     }
 
-    public boolean validateJSONStructure() {
+    public List<String[]> parseJsonStructure() throws InvalidJsonFileException {
+        ArrayList<String[]> parsedObjects = new ArrayList<>();
         try {
-            JsonElement jsonElement = JsonParser.parseString(getFileContent());
+            JsonElement jsonElement = JsonParser.parseString(getRawContent());
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonObject employees = getJsonObjectField(jsonObject, "employees").getAsJsonObject();
             JsonArray employee = getJsonObjectField(employees, "employee").getAsJsonArray();
@@ -39,16 +42,17 @@ public class EmployeeFile {
                 String firstName = getJsonObjectField(employeeObject, "firstName").getAsString();
                 String lastName = getJsonObjectField(employeeObject, "lastName").getAsString();
                 String photo = getJsonObjectField(employeeObject, "photo").getAsString();
+                parsedObjects.add(new String[]{id, firstName, lastName, photo});
             }
-            return true;
-        } catch (InvalidJsonFieldException | JsonSyntaxException e) {
-            return false;
+        } catch (JsonSyntaxException e) {
+            throw new InvalidJsonFileException(e.getMessage());
         }
+        return parsedObjects;
     }
 
-    private JsonElement getJsonObjectField(JsonObject parentObject, String fieldName) throws InvalidJsonFieldException {
+    private JsonElement getJsonObjectField(JsonObject parentObject, String fieldName) throws InvalidJsonFileException {
         if (!parentObject.has(fieldName)) {
-            throw new InvalidJsonFieldException("Field " + fieldName + " not found");
+            throw new InvalidJsonFileException("Field " + fieldName + " not found");
         }
         return parentObject.get(fieldName);
     }
