@@ -1,19 +1,14 @@
 package com.project.frontend;
-import java.awt.Image;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
-import java.awt.BorderLayout;import java.io.IOException;
+import java.awt.*;
+import javax.swing.*;
+import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
-import javax.swing.ImageIcon;
-import java.awt.Font;
-import javax.swing.JButton;  
-import javax.swing.JFrame;  
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
 import java.util.ArrayList;
 import java.util.List;
+
+import com.project.backend.EmployeeManager;
+import com.project.backend.InvalidJsonFileException;
 
 public class ContentDisplay {
     private List<String> employeeList;
@@ -24,9 +19,16 @@ public class ContentDisplay {
 
     public ContentDisplay(){
         employeeList = new ArrayList<String>();
-        employeeList.add("1,Jeff,Bezos,https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQ_93nQOc7LMrdcjPK4LhDcdyThGbgBGvxToNPdT5GHHY21raN49dv8a5w&s=10");
-        employeeList.add("2,Elon,Musk,https://i1.sndcdn.com/artworks-uJOYShilCZeAYJJE-sBmXcA-t500x500.jpg");
-        employeeList.add("3,Mark,Zuckerberg,https://dircomfidencial.com/wp-content/uploads/2021/10/mark.jpg");
+        EmployeeManager employeeManager = new EmployeeManager();
+
+        try {
+            employeeManager.loadEmployeesFromJson("src/test/resources/employees.json");
+            employeeManager.getEmployees().forEach(employee -> {
+                employeeList.add(employee.getId() + "," + employee.getFirstName() + "," + employee.getLastName() + "," + employee.getPhoto());
+            });
+        } catch (IOException | InvalidJsonFileException e) {
+            e.printStackTrace();
+        }
         currentImg = new JLabel();
         updateImgUrl();
     }
@@ -36,46 +38,37 @@ public class ContentDisplay {
         JPanel panel = new JPanel();
 
         textFields = renderEmployeeData(0);
-
         for (int i = 0; i < textFields.size(); i++) {
             panel.add(new JLabel(headers[i]));
             panel.add(textFields.get(i));
         }
 
         JButton previo = new JButton();   
-        previo.setText("Previo");
+        previo.setText("☜Previo");
         previo.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if(employeeIndex != 0) employeeIndex--;
-                    updateTextField(textFields, employeeIndex);
-                    updateImgUrl();
-                }
+            event->{
+                if(employeeIndex != 0) employeeIndex--;
+                updateTextField(textFields, employeeIndex);
+                updateImgUrl();
             }
         ); 
 
         JButton siguiente = new JButton();   
-        siguiente.setText("Siguiente");
+        siguiente.setText("Siguiente☞");
         siguiente.addActionListener(
-            new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if(employeeIndex != employeeList.size()-1) employeeIndex++;
-                    updateTextField(textFields, employeeIndex);
-                    updateImgUrl();
-                }
+            event ->{
+                if(employeeIndex != employeeList.size()-1) employeeIndex++;
+                updateTextField(textFields, employeeIndex);
+                updateImgUrl();
             }
         ); 
 
-        frame.getContentPane().add(currentImg, BorderLayout.CENTER);
-        panel.add(new JLabel(headers[headers.length-1]));//Renderiza palabra: Imagen
-        panel.add(currentImg);
         panel.add(previo); 
         panel.add(siguiente);
-       
+        panel.add(currentImg);
+        
         frame.add(panel);  
-        frame.setSize(400, 800);  
+        frame.setSize(400, 600);  
         frame.setLocationRelativeTo(null);  
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);  
         frame.setVisible(true);  
