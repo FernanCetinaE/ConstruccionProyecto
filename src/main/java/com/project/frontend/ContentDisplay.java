@@ -23,9 +23,7 @@ public class ContentDisplay {
 
         try {
             employeeManager.loadEmployeesFromJson("src/test/resources/employees.json");
-            employeeManager.getEmployees().forEach(employee -> {
-                employeeList.add(employee.getId() + "," + employee.getFirstName() + "," + employee.getLastName() + "," + employee.getPhoto());
-            });
+            employeeList = employeeManager.getEmployeesAsString();
         } catch (IOException | InvalidJsonFileException e) {
             e.printStackTrace();
         }
