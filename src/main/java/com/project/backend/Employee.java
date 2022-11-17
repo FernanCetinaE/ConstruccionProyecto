@@ -28,4 +28,9 @@ public class Employee {
     public String getPhoto() {
         return photo;
     }
+
+    @Override
+    public String toString() {
+        return this.id + "," + this.firstName + "," + this.lastName + "," + this.photo;
+    }
 }
