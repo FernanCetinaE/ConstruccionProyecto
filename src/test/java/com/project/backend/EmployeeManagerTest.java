@@ -15,6 +15,6 @@ public class EmployeeManagerTest {
     public void testEmployeeLoad() throws InvalidJsonFileException, IOException {
         EmployeeManager employeeManager = new EmployeeManager();
         employeeManager.loadEmployeesFromJson(EMPLOYEES_FILE_ROUTE);
-        assertEquals(3, employeeManager.getEmployees().size());
+        assertEquals(3, employeeManager.getEmployeesAsString().size());
     }
 }
