@@ -3,15 +3,16 @@ package com.project.backend;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class EmployeeManager {
-    List<Employee> employees;
+    private List<Employee> employees;
 
-    public List<Employee> getEmployees() {
+    public List<String> getEmployeesAsString() {
         if (employees == null) {
             throw new RuntimeException("Employees list is null, please load the file first");
         }
-        return employees;
+        return employees.stream().map(Employee::toString).collect(Collectors.toList());
     }
 
     public void loadEmployeesFromJson(String fileRoute) throws IOException, InvalidJsonFileException {
