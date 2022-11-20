@@ -1,38 +1,54 @@
 package com.project.backend;
 
 import com.google.gson.*;
+import com.google.gson.stream.JsonWriter;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.util.ArrayList;
 import java.util.List;
 
 public class EmployeeFile {
-    private String rawContent;
+    private final String fileRoute;
 
-    public String getRawContent() {
-        if (rawContent == null) {
-            throw new RuntimeException("File content is null, please load the file first");
-        }
-        return rawContent;
+    public EmployeeFile(String fileRoute) {
+        this.fileRoute = fileRoute;
     }
 
-    public void loadFile(String fileRoute) throws IOException {
+    public String loadFile() throws IOException {
         StringBuilder fileContent = new StringBuilder();
-        try (BufferedReader br = new BufferedReader(new FileReader(fileRoute))) {
+        try (BufferedReader br = new BufferedReader(new FileReader(this.fileRoute))) {
             String line;
             while ((line = br.readLine()) != null) {
                 fileContent.append(line);
             }
         }
-        this.rawContent = fileContent.toString();
+        return fileContent.toString();
     }
 
-    public List<String[]> parseJsonStructure() throws InvalidJsonFileException {
+    public void saveToFile(List<Employee> employees) throws IOException {
+        JsonObject employeesObject = new JsonObject();
+        JsonArray employeesArray = new JsonArray();
+        for (Employee employee : employees) {
+            JsonObject employeeObject = new JsonObject();
+            employeeObject.addProperty("id", employee.getId());
+            employeeObject.addProperty("firstName", employee.getFirstName());
+            employeeObject.addProperty("lastName", employee.getLastName());
+            employeeObject.addProperty("photo", employee.getPhoto());
+            employeesArray.add(employeeObject);
+        }
+        employeesObject.add("employee", employeesArray);
+        JsonObject rootObject = new JsonObject();
+        rootObject.add("employees", employeesObject);
+        try (JsonWriter jw = new JsonWriter(new FileWriter(fileRoute))) {
+            jw.setIndent("  ");
+            new Gson().toJson(rootObject, jw);
+        }
+    }
+
+    public List<String[]> parseJsonStructure(String rawJsonContent) throws InvalidJsonFileException {
         ArrayList<String[]> parsedObjects = new ArrayList<>();
         try {
-            JsonElement jsonElement = JsonParser.parseString(getRawContent());
+            JsonElement jsonElement = JsonParser.parseString(rawJsonContent);
             JsonObject jsonObject = jsonElement.getAsJsonObject();
             JsonObject employees = getJsonObjectField(jsonObject, "employees").getAsJsonObject();
             JsonArray employee = getJsonObjectField(employees, "employee").getAsJsonArray();
