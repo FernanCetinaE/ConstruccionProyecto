@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.project.backend.EmployeeFile;
 import com.project.backend.EmployeeManager;
 import com.project.backend.InvalidJsonFileException;
 
@@ -19,10 +20,11 @@ public class ContentDisplay {
 
     public ContentDisplay(){
         employeeList = new ArrayList<String>();
-        EmployeeManager employeeManager = new EmployeeManager();
+        EmployeeFile repository = new EmployeeFile("employees.json");
+        EmployeeManager employeeManager = new EmployeeManager(repository);
 
         try {
-            employeeManager.loadEmployeesFromJson("src/test/resources/employees.json");
+            employeeManager.loadEmployeesFromJson();
             employeeList = employeeManager.getEmployeesAsString();
         } catch (IOException | InvalidJsonFileException e) {
             e.printStackTrace();
