@@ -7,6 +7,7 @@ import javax.imageio.ImageIO;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.project.backend.Employee;
 import com.project.backend.EmployeeFile;
 import com.project.backend.EmployeeManager;
 import com.project.backend.InvalidJsonFileException;
@@ -20,15 +21,7 @@ public class ContentDisplay {
 
     public ContentDisplay(){
         employeeList = new ArrayList<String>();
-        EmployeeFile repository = new EmployeeFile("employees.json");
-        EmployeeManager employeeManager = new EmployeeManager(repository);
-
-        try {
-            employeeManager.loadEmployeesFromJson();
-            employeeList = employeeManager.getEmployeesAsString();
-        } catch (IOException | InvalidJsonFileException e) {
-            e.printStackTrace();
-        }
+        fetchEmployees();
         currentImg = new JLabel();
         updateImgUrl();
     }
@@ -63,8 +56,17 @@ public class ContentDisplay {
             }
         ); 
 
+        JButton test = new JButton();   
+        test.setText("Guadar cambios");
+        test.addActionListener(
+            event ->{
+                updateEmployee();
+            }
+        ); 
+
         panel.add(previo); 
         panel.add(siguiente);
+        panel.add(test);
         panel.add(currentImg);
         
         frame.add(panel);  
@@ -74,12 +76,12 @@ public class ContentDisplay {
         frame.setVisible(true);  
     }
 
-    private JTextField renderTextField(String text){
+    private JTextField renderTextField(String text,Boolean editable){
         Font font = new Font("SansSerif", Font.BOLD, 20);
         JTextField textField = new JTextField(text,18);
         textField.setText(text);
         textField.setFont(font);
-        textField.setEditable(false);
+        textField.setEditable(editable);
         return textField;
     }
 
@@ -87,8 +89,8 @@ public class ContentDisplay {
         String[] employeeData = employeeList.get(index).split(",");
         ArrayList<JTextField> listOfFields = new ArrayList<>();
 
-        for (int i = 0; i < employeeData.length-1; i++) {
-            listOfFields.add(renderTextField(employeeData[i]));
+        for (int i = 0; i < employeeData.length; i++) {
+            listOfFields.add(renderTextField(employeeData[i],i!=0));
         }
 
         return listOfFields;
@@ -112,5 +114,36 @@ public class ContentDisplay {
             e.printStackTrace();
         }
         currentImg.setIcon(new ImageIcon(image));
+    }
+
+    /* CRUD DE EMPLOYEES */
+    private void fetchEmployees(){
+        EmployeeFile repository = new EmployeeFile("employees.json");
+        EmployeeManager employeeManager = new EmployeeManager(repository);
+
+        try {
+            employeeManager.loadEmployeesFromJson();
+            employeeList = employeeManager.getEmployeesAsString();
+        } catch (IOException | InvalidJsonFileException e) {
+            e.printStackTrace();
+        }
+    }
+
+    private void updateEmployee(){
+        EmployeeFile repository = new EmployeeFile("employees.json");
+        EmployeeManager employeeManager = new EmployeeManager(repository);
+
+        try{
+            employeeManager.loadEmployeesFromJson();
+            Employee employee = new Employee(textFields.get(0).getText(), textFields.get(1).getText(), 
+                                            textFields.get(2).getText(), textFields.get(3).getText());
+                                            
+            employeeManager.modifyEmployeeById(textFields.get(0).getText(),employee);
+        } catch (IOException | InvalidJsonFileException e){
+            e.printStackTrace();
+        }
+
+        fetchEmployees();
+        updateImgUrl();
     }
 }
