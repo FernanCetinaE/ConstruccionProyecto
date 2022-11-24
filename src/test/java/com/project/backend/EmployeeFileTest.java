@@ -16,35 +16,31 @@ public class EmployeeFileTest {
     @Test
     @DisplayName("Test if the test.txt file content is read correctly")
     public void testFileContent() throws IOException {
-        EmployeeFile employeeFile = new EmployeeFile();
-        employeeFile.loadFile(TEST_FILE_ROUTE);
-        assertEquals("Hello, world!", employeeFile.getRawContent());
+        EmployeeFile employeeFile = new EmployeeFile(TEST_FILE_ROUTE);
+        assertEquals("Hello, world!", employeeFile.loadFile());
     }
 
     @Test
     @DisplayName("Test if the employees.json file is read correctly")
     public void readEmployeeFileContent() throws IOException {
-        EmployeeFile employeeFile = new EmployeeFile();
-        employeeFile.loadFile(EMPLOYEES_FILE_ROUTE);
-        String fileContent = employeeFile.getRawContent();
-        assertNotNull(fileContent);
+        EmployeeFile employeeFile = new EmployeeFile(EMPLOYEES_FILE_ROUTE);
+        String fileContent = employeeFile.loadFile();
         assertFalse(fileContent.isEmpty());
     }
 
     @Test
     @DisplayName("Test that the JSON structure is valid")
     public void validateJSONStructure() throws IOException, InvalidJsonFileException {
-        EmployeeFile employeeFile = new EmployeeFile();
-        employeeFile.loadFile(EMPLOYEES_FILE_ROUTE);
-        List<String[]> parsedObjects = employeeFile.parseJsonStructure();
+        EmployeeFile employeeFile = new EmployeeFile(EMPLOYEES_FILE_ROUTE);
+        String rawJson = employeeFile.loadFile();
+        List<String[]> parsedObjects = employeeFile.parseJsonStructure(rawJson);
         assertEquals(3, parsedObjects.size());
     }
 
     @Test
     @DisplayName("Test that the JSON structure is invalid")
-    public void validateInvalidJSONStructure() throws IOException {
-        EmployeeFile employeeFile = new EmployeeFile();
-        employeeFile.loadFile(INVALID_EMPLOYEES_FILE_ROUTE);
-        assertThrows(InvalidJsonFileException.class, employeeFile::parseJsonStructure);
+    public void validateInvalidJSONStructure() {
+        EmployeeFile employeeFile = new EmployeeFile(INVALID_EMPLOYEES_FILE_ROUTE);
+        assertThrows(InvalidJsonFileException.class, () -> employeeFile.parseJsonStructure(employeeFile.loadFile()));
     }
 }

@@ -6,29 +6,41 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class EmployeeManager {
-    private List<Employee> employees;
+    private final EmployeeFile repository;
+    private final List<Employee> employees;
+
+    public EmployeeManager(EmployeeFile repository) {
+        this.repository = repository;
+        this.employees = new ArrayList<>();
+    }
+
+    public List<Employee> getEmployees() {
+        return employees;
+    }
 
     public List<String> getEmployeesAsString() {
-        if (employees == null) {
-            throw new RuntimeException("Employees list is null, please load the file first");
-        }
         return employees.stream().map(Employee::toString).collect(Collectors.toList());
     }
 
-    public void loadEmployeesFromJson(String fileRoute) throws IOException, InvalidJsonFileException {
-        employees = new ArrayList<>();
+    public void loadEmployeesFromJson() throws IOException, InvalidJsonFileException {
+        employees.clear();
 
-        EmployeeFile employeeFile = new EmployeeFile();
-        employeeFile.loadFile(fileRoute);
-        List<String[]> parsedObjects = employeeFile.parseJsonStructure();
+        String rawJsonContent = repository.loadFile();
+        List<String[]> parsedObjects = repository.parseJsonStructure(rawJsonContent);
         for (String[] parsedObject : parsedObjects) {
-            Employee employee = new Employee(
-                    parsedObject[0],
-                    parsedObject[1],
-                    parsedObject[2],
-                    parsedObject[3]
-            );
+            Employee employee = new Employee(parsedObject[0], parsedObject[1], parsedObject[2], parsedObject[3]);
             employees.add(employee);
         }
+    }
+
+    public boolean modifyEmployeeById(String employeeId, Employee newData) throws IOException {
+        for (int i = 0; i < employees.size(); i++) {
+            if (employees.get(i).getId().equals(employeeId)) {
+                employees.set(i, newData);
+                repository.saveToFile(employees);
+                return true;
+            }
+        }
+        return false;
     }
 }
