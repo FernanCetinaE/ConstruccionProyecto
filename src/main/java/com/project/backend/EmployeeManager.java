@@ -3,6 +3,7 @@ package com.project.backend;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class EmployeeManager {
@@ -34,13 +35,29 @@ public class EmployeeManager {
     }
 
     public boolean modifyEmployeeById(String employeeId, Employee newData) throws IOException {
-        for (int i = 0; i < employees.size(); i++) {
-            if (employees.get(i).getId().equals(employeeId)) {
-                employees.set(i, newData);
-                repository.saveToFile(employees);
-                return true;
-            }
+        Optional<Employee> employee = findEmployeeById(employeeId);
+        if (employee.isPresent()) {
+            Employee employeeToModify = employee.get();
+            employeeToModify.setFirstName(newData.getFirstName());
+            employeeToModify.setLastName(newData.getLastName());
+            employeeToModify.setPhoto(newData.getPhoto());
+            repository.saveToFile(employees);
+            return true;
         }
         return false;
+    }
+
+    public boolean deleteEmployeeById(String employeeId) throws IOException {
+        Optional<Employee> employee = findEmployeeById(employeeId);
+        if (employee.isPresent()) {
+            employees.remove(employee.get());
+            repository.saveToFile(employees);
+            return true;
+        }
+        return false;
+    }
+
+    public Optional<Employee> findEmployeeById(String employeeId) {
+        return employees.stream().filter(e -> e.getId().equals(employeeId)).findFirst();
     }
 }
