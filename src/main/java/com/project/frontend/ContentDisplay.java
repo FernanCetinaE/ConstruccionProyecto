@@ -56,19 +56,27 @@ public class ContentDisplay {
             }
         ); 
 
-        JButton test = new JButton();   
-        test.setText("Guadar cambios");
-        test.addActionListener(
+        JButton actualizar = new JButton();   
+        actualizar.setText("Guadar");
+        actualizar.addActionListener(
             event ->{
                 updateEmployee();
             }
         ); 
 
+        JButton eliminar = new JButton();   
+        eliminar.setText("borrar");
+        eliminar.addActionListener(
+            event ->{
+                deleteEmployee();
+            }
+        ); 
+
         panel.add(previo); 
         panel.add(siguiente);
-        panel.add(test);
+        panel.add(actualizar);
+        panel.add(eliminar);
         panel.add(currentImg);
-        
         frame.add(panel);  
         frame.setSize(400, 600);  
         frame.setLocationRelativeTo(null);  
@@ -144,6 +152,24 @@ public class ContentDisplay {
         }
 
         fetchEmployees();
+        updateImgUrl();
+    }
+
+    //eliminar empleado
+    private void deleteEmployee(){
+        EmployeeFile repository = new EmployeeFile("employees.json");
+        EmployeeManager employeeManager = new EmployeeManager(repository);
+
+        try{
+            employeeManager.loadEmployeesFromJson();
+            employeeManager.deleteEmployeeById(textFields.get(0).getText());
+        } catch (IOException | InvalidJsonFileException e){
+            e.printStackTrace();
+        }
+
+        fetchEmployees();
+        if (employeeIndex!=0) employeeIndex = employeeIndex -1;
+        updateTextField(textFields, employeeIndex);
         updateImgUrl();
     }
 }

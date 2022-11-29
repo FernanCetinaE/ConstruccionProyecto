@@ -1,23 +1,32 @@
 package com.project.backend;
 
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.DisplayName;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 public class EmployeeManagerTest {
-    private final static String EMPLOYEES_FILE_ROUTE = "src/test/resources/employees.json";
+    private final static String BASE_PATH = "src/test/resources/employees.json";
+    private final static String EMPLOYEES_FILE_ROUTE = "src/test/resources/employees_copy.json";
     private static EmployeeManager employeeManager;
 
-    @BeforeAll
-    public static void setUp() throws IOException, InvalidJsonFileException {
+    @BeforeEach
+    public  void setUp() throws IOException, InvalidJsonFileException {
+        Files.copy(Paths.get(BASE_PATH), Paths.get(EMPLOYEES_FILE_ROUTE), StandardCopyOption.REPLACE_EXISTING);
+
         EmployeeFile repository = new EmployeeFile(EMPLOYEES_FILE_ROUTE);
         employeeManager = new EmployeeManager(repository);
         employeeManager.loadEmployeesFromJson();
+    }
+
+    @AfterAll
+    public static void tearDown() throws IOException {
+        Files.delete(Paths.get(EMPLOYEES_FILE_ROUTE));
     }
 
     @Test
@@ -29,12 +38,21 @@ public class EmployeeManagerTest {
     @Test
     @DisplayName("Test that an employee can be modified and saved to the employee.json file")
     public void testEmployeeModify() throws IOException {
-        Employee employee = employeeManager.getEmployees().get(0);
+        Employee employee = new Employee("1", "John", "Doe", "https://www.google.com");
         employee.setFirstName("John");
-        boolean modifiedSuccessfully = employeeManager.modifyEmployeeById(employee.getId(), employee);
-        employee = employeeManager.getEmployees().get(0);
+        assertTrue(employeeManager.modifyEmployeeById("1", employee));
+        assertEquals("John", employeeManager.getEmployees().get(0).getFirstName());
 
-        assertTrue(modifiedSuccessfully);
-        assertEquals(employee.getFirstName(), "John");
+        employee.setFirstName("Jane");
+        assertTrue(employeeManager.modifyEmployeeById("1", employee));
+        assertEquals("Jane", employeeManager.getEmployees().get(0).getFirstName());
+    }
+
+    @Test
+    @DisplayName("Test that an employee can be deleted and update the employee.json file")
+    public void testEmployeeDelete() throws IOException {
+        assertEquals(3, employeeManager.getEmployeesAsString().size());
+        assertTrue(employeeManager.deleteEmployeeById("1"));
+        assertEquals(2, employeeManager.getEmployeesAsString().size());
     }
 }
