@@ -18,24 +18,6 @@
         "firstName": "Robert 2",
         "lastName": "Downey Jr. 2",
         "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg"
-      },
-      {
-        "id": "4",
-        "firstName": "Robert 3",
-        "lastName": "Downey Jr. 3",
-        "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg"
-      },
-      {
-        "id": "5",
-        "firstName": "Robert 4",
-        "lastName": "Downey Jr. 4",
-        "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg"
-      },
-      {
-        "id": "6",
-        "firstName": "Robert 5",
-        "lastName": "Downey Jr. 5",
-        "photo": "https://jsonformatter.org/img/Robert-Downey-Jr.jpg"
       }
     ]
   }
