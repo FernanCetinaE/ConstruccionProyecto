@@ -55,4 +55,14 @@ public class EmployeeManagerTest {
         assertTrue(employeeManager.deleteEmployeeById("1"));
         assertEquals(2, employeeManager.getEmployeesAsString().size());
     }
+
+
+    @Test
+    @DisplayName("Test that a new employee can be added and saved to the employee.json file")
+    public void testEmployeeAdd() throws IOException {
+        assertEquals(3, employeeManager.getEmployeesAsString().size());
+        Employee newEmployee = employeeManager.addNewEmployee("John", "Doe", "https://www.google.com");
+        assertEquals(4, employeeManager.getEmployeesAsString().size());
+        assertEquals(newEmployee, employeeManager.getEmployees().get(3));
+    }
 }

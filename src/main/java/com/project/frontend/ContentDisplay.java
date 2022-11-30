@@ -13,7 +13,7 @@ import com.project.backend.EmployeeManager;
 import com.project.backend.InvalidJsonFileException;
 
 public class ContentDisplay {
-    private List<String> employeeList;
+    public List<String> employeeList;
     private String[] headers = {"Identificador: ", "Nombre: ", "Apellido: ", "Imagen: "};
     private List<JTextField> textFields;
     private int employeeIndex = 0;
@@ -29,6 +29,16 @@ public class ContentDisplay {
     public void renderDisplay(){
         JFrame frame = new JFrame("Contabilidad");  
         JPanel panel = new JPanel();
+
+        JButton agregar = new JButton();   
+        agregar.setText("Agregar");
+        agregar.addActionListener(
+            event ->{
+                AddEmployee add = new AddEmployee(this);
+                add.renderDisplay();
+            }
+        ); 
+        panel.add(agregar);
 
         textFields = renderEmployeeData(0);
         for (int i = 0; i < textFields.size(); i++) {
@@ -76,9 +86,10 @@ public class ContentDisplay {
         panel.add(siguiente);
         panel.add(actualizar);
         panel.add(eliminar);
+        panel.add(agregar);
         panel.add(currentImg);
         frame.add(panel);  
-        frame.setSize(400, 600);  
+        frame.setSize(350, 600);  
         frame.setLocationRelativeTo(null);  
         frame.setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);  
         frame.setVisible(true);  

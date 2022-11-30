@@ -57,6 +57,15 @@ public class EmployeeManager {
         return false;
     }
 
+    public Employee addNewEmployee(String firstName, String lastName, String photo) throws IOException {
+        String id = String.valueOf(employees.size() + 1);
+        Employee newEmployee = new Employee(id, firstName, lastName, photo);
+        employees.add(newEmployee);
+        repository.saveToFile(employees);
+        return newEmployee;
+    }
+
+
     public Optional<Employee> findEmployeeById(String employeeId) {
         return employees.stream().filter(e -> e.getId().equals(employeeId)).findFirst();
     }
